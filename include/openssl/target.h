@@ -176,6 +176,10 @@
 #define OPENSSL_OPENBSD
 #endif
 
+#if defined(__sun__)
+#define OPENSSL_SOLARIS
+#endif
+
 // BoringSSL requires platform's locking APIs to make internal global state
 // thread-safe, including the PRNG. On some single-threaded embedded platforms,
 // locking APIs may not exist, so this dependency may be disabled with the

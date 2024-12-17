@@ -181,12 +181,25 @@ static const void* function_entry_ptr(const void* func_sym) {
 // These symbols are filled in by delocate.go (in static builds) or a linker
 // script (in shared builds). They point to the start and end of the module, and
 // the location of the integrity hash, respectively.
+#if !defined(OPENSSL_SOLARIS)
 extern const uint8_t BORINGSSL_bcm_text_start[];
 extern const uint8_t BORINGSSL_bcm_text_end[];
 extern const uint8_t BORINGSSL_bcm_text_hash[];
 #if defined(BORINGSSL_SHARED_LIBRARY)
 extern const uint8_t BORINGSSL_bcm_rodata_start[];
 extern const uint8_t BORINGSSL_bcm_rodata_end[];
+#endif
+#else
+// Solaris linker script cannot fill these so we need to use workaround here.
+const uint8_t BORINGSSL_bcm_text_start[]
+    __attribute__ ((section (".text.boring_start"))) = { 0 };
+const uint8_t BORINGSSL_bcm_rodata_start[]
+    __attribute__ ((section (".rodata.boring_start"))) = { 0 };
+const uint8_t BORINGSSL_bcm_text_end[]
+    __attribute__ ((section (".text.boring_end"))) = { 0 };
+const uint8_t BORINGSSL_bcm_rodata_end[]
+    __attribute__ ((section (".rodata.boring_end"))) = { 0 };
+extern const uint8_t BORINGSSL_bcm_text_hash[];
 #endif
 
 // assert_within is used to sanity check that certain symbols are within the

@@ -349,8 +349,9 @@ static void wait_for_entropy(void) {
     return;
   }
 
+// On MacOS, iOS, OpenBSD and Solaris we don't use /dev/urandom.
 #if defined(BORINGSSL_FIPS) && !defined(URANDOM_BLOCKS_FOR_ENTROPY) && \
-    !(defined(OPENSSL_APPLE) || defined(OPENSSL_OPENBSD)) // On MacOS, iOS, and OpenBSD we don't use /dev/urandom.
+    !(defined(OPENSSL_APPLE) || defined(OPENSSL_OPENBSD) || defined(OPENSSL_SOLARIS))
 
   // In FIPS mode on platforms where urandom doesn't block at startup, we ensure
   // that the kernel has sufficient entropy before continuing. This is

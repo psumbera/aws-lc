@@ -558,6 +558,20 @@ elseif(FIPS_SHARED)
       DEPENDS  fips_msvc_start.obj fips_msvc_end.obj bcm_library
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
+  elseif(${CMAKE_SYSTEM_NAME} STREQUAL "SunOS")
+    set(BCM_NAME bcm.o)
+    # This is equivalent of gcc_fips_shared.lds for Solaris linker. Clang is not tested now and thus not supported.
+    set(FIPS_CUSTOM_LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/solaris_fips_shared.lds")
+    if (!GCC)
+      message(FATAL_ERROR "Only GCC is tested for Solaris now." )
+    endif()
+
+    add_custom_command(
+      OUTPUT ${BCM_NAME}
+      COMMAND ${CMAKE_LINKER} -r -M ${FIPS_CUSTOM_LINKER_SCRIPT} -o ${BCM_NAME} --whole-archive $<TARGET_FILE:bcm_library>
+      DEPENDS bcm_library ${FIPS_CUSTOM_LINKER_SCRIPT}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
   else()
     set(BCM_NAME bcm.o)
     # fips_shared.lds does not have 'clang' prefix because we want to keep merging any changes from upstream.
